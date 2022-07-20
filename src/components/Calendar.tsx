@@ -1,45 +1,71 @@
-import React from "react";
+import React, { useEffect, useState, MouseEvent } from "react";
+import {
+  DAYS,
+  DAY_IN_MILLISECONDS,
+  getMonthDays,
+  initMonth,
+  MONTHS,
+} from "../helpers";
 
-interface ICalendarProps {}
+interface ICalendarProps {
+  startDate: number;
+  endDate?: number;
+}
 
 export default function Calendar(props: ICalendarProps) {
+  const [monthDays, setMonthDays] = useState<number[]>([]);
+  const [activeMonthIdx, setActiveMonthIdx] = useState(0);
+
+  useEffect(() => {
+    setMonthDays(initMonth(new Date().getTime(), setActiveMonthIdx));
+  }, []);
+
+  const handlePrevClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const tempMonthDays = getMonthDays(
+      monthDays[0] - DAY_IN_MILLISECONDS,
+      false
+    );
+    if (activeMonthIdx === 0) {
+      setActiveMonthIdx(11);
+    } else {
+      setActiveMonthIdx(activeMonthIdx - 1);
+    }
+    setMonthDays([...tempMonthDays]);
+  };
+  const handleNextClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const tempMonthDays = getMonthDays(
+      monthDays[34] + DAY_IN_MILLISECONDS,
+      true
+    );
+    if (activeMonthIdx === 11) {
+      setActiveMonthIdx(0);
+    } else {
+      setActiveMonthIdx(activeMonthIdx + 1);
+    }
+    setMonthDays([...tempMonthDays]);
+  };
+
   return (
-    <div className="drp_wrapper">
-      <button className="drp-date">1</button>
-      <button className="drp-date">2</button>
-      <button className="drp-date">3</button>
-      <button className="drp-date">4</button>
-      <button className="drp-date">5</button>
-      <button className="drp-date">6</button>
-      <button className="drp-date">7</button>
-      <button className="drp-date">8</button>
-      <button className="drp-date">9</button>
-      <button className="drp-date">10</button>
-      <button className="drp-date">11</button>
-      <button className="drp-date">12</button>
-      <button className="drp-date">13</button>
-      <button className="drp-date">14</button>
-      <button className="drp-date">15</button>
-      <button className="drp-date">16</button>
-      <button className="drp-date">17</button>
-      <button className="drp-date">19</button>
-      <button className="drp-date">20</button>
-      <button className="drp-date">21</button>
-      <button className="drp-date">22</button>
-      <button className="drp-date">23</button>
-      <button className="drp-date">24</button>
-      <button className="drp-date">25</button>
-      <button className="drp-date">26</button>
-      <button className="drp-date">27</button>
-      <button className="drp-date">28</button>
-      <button className="drp-date">29</button>
-      <button className="drp-date">30</button>
-      <button className="drp-date">31</button>
-      <button className="drp-date">1</button>
-      <button className="drp-date">2</button>
-      <button className="drp-date">3</button>
-      <button className="drp-date">4</button>
-      <button className="drp-date">5</button>
+    <div className="drp_calendar_wrapper">
+      <div className="drp_next_prev_btns_wrapper">
+        <button onClick={handlePrevClick}>Prev</button>
+        <span>{MONTHS[activeMonthIdx]}</span>
+        <button onClick={handleNextClick}>Next</button>
+      </div>
+      <div className="drp_day_labels_wrapper">
+        {DAYS.map((day: string, idx: number) => (
+          <div key={idx}>{day}</div>
+        ))}
+      </div>
+      <div className="drp_days_wrapper">
+        {monthDays.map((date: number, idx: number) => (
+          <button key={idx} className="drp-date">
+            {new Date(date).getDate()}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
