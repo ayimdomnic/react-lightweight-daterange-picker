@@ -1,49 +1,123 @@
-import React, { useEffect, useState, MouseEvent } from "react";
+import React, { useEffect, useState, MouseEvent, useLayoutEffect } from "react";
 import {
   DAYS,
   DAY_IN_MILLISECONDS,
+  getDatesBetween,
   getMonthDays,
   initMonth,
+  isToday,
   MONTHS,
 } from "../helpers";
 
 interface ICalendarProps {
   startDate: number;
   endDate?: number;
+  setDates: React.Dispatch<
+    React.SetStateAction<
+      | {
+          startDate: number | undefined;
+          endDate: number | undefined;
+        }
+      | undefined
+    >
+  >;
 }
 
-export default function Calendar(props: ICalendarProps) {
+export default function Calendar({ setDates, ...props }: ICalendarProps) {
   const [monthDays, setMonthDays] = useState<number[]>([]);
   const [activeMonthIdx, setActiveMonthIdx] = useState(0);
+  const [startDate, setStartDate] = useState<number>();
+  const [endDate, setEndDate] = useState<number>();
+  const [datesBetween, setDatesBetween] = useState<number[]>([]);
+
+  useLayoutEffect(() => {
+    // Check if the dates have a common factor
+    setMonthDays(initMonth(props.startDate, setActiveMonthIdx));
+  }, [props.endDate, props.startDate]);
 
   useEffect(() => {
-    setMonthDays(initMonth(new Date().getTime(), setActiveMonthIdx));
-  }, []);
+    if (props.startDate) {
+      const newStartDate = new Date(props.startDate);
+      const startDateIsToday = isToday(newStartDate);
+      if (!startDateIsToday) {
+        if (props.endDate) {
+          setDatesBetween(getDatesBetween(props.startDate, props.endDate));
+        } else {
+          setDatesBetween([props.startDate]);
+        }
+      }
+    }
+    if (props.endDate) {
+      setEndDate(props.endDate);
+    }
+  }, [props.startDate, props.endDate]);
+
+  console.log("startDate :>> ", startDate);
+
+  const handleDatePick = (e: MouseEvent<HTMLButtonElement>, val: number) => {
+    e.preventDefault();
+    if (!startDate) {
+      setStartDate(val);
+      setDatesBetween([val]);
+    } else {
+      if (val < startDate) {
+        setEndDate(startDate);
+        setStartDate(val);
+        setDatesBetween(getDatesBetween(val, startDate));
+        // setDates({ startDate: val, endDate: startDate });
+      } else if (val > startDate) {
+        setEndDate(val);
+        setDatesBetween(getDatesBetween(startDate, val));
+        // setDates({ startDate, endDate: val });
+      } else {
+        setStartDate(val);
+        setEndDate(val);
+        // setDates({ startDate: val, endDate: val });
+        setDatesBetween(getDatesBetween(val, val));
+      }
+    }
+  };
+
+  // console.log("datesBetween :>> ", datesBetween);
 
   const handlePrevClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    let tempMonthIdx = 0;
+    if (activeMonthIdx === 0) {
+      tempMonthIdx = 11;
+      // setActiveMonthIdx(11);
+    } else {
+      tempMonthIdx = activeMonthIdx - 1;
+      // setActiveMonthIdx(activeMonthIdx - 1);
+    }
+
     const tempMonthDays = getMonthDays(
       monthDays[0] - DAY_IN_MILLISECONDS,
-      false
+      false,
+      tempMonthIdx
     );
-    if (activeMonthIdx === 0) {
-      setActiveMonthIdx(11);
-    } else {
-      setActiveMonthIdx(activeMonthIdx - 1);
-    }
+    setActiveMonthIdx(tempMonthIdx);
     setMonthDays([...tempMonthDays]);
   };
+
   const handleNextClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    let tempMonthIdx = 0;
+    if (activeMonthIdx === 11) {
+      tempMonthIdx = 0;
+      // setActiveMonthIdx(0);
+    } else {
+      tempMonthIdx = activeMonthIdx + 1;
+      // setActiveMonthIdx(activeMonthIdx + 1);
+    }
     const tempMonthDays = getMonthDays(
       monthDays[34] + DAY_IN_MILLISECONDS,
-      true
+      true,
+      tempMonthIdx
     );
-    if (activeMonthIdx === 11) {
-      setActiveMonthIdx(0);
-    } else {
-      setActiveMonthIdx(activeMonthIdx + 1);
-    }
+    setActiveMonthIdx(tempMonthIdx);
     setMonthDays([...tempMonthDays]);
   };
 
@@ -60,12 +134,32 @@ export default function Calendar(props: ICalendarProps) {
         ))}
       </div>
       <div className="drp_days_wrapper">
-        {monthDays.map((date: number, idx: number) => (
-          <button key={idx} className="drp-date">
-            {new Date(date).getDate()}
-          </button>
-        ))}
+        {monthDays.map((date: number, idx: number) => {
+          const _isToday = isToday(new Date(date));
+          const _isSelected = datesBetween.find((d) => d === date);
+          return (
+            <button
+              key={idx}
+              className={`drp-date ${_isToday ? `today` : ``} ${
+                _isSelected ? `selected` : ``
+              }`}
+              onClick={(e) => handleDatePick(e, date)}
+            >
+              {new Date(date).getDate()}
+            </button>
+          );
+        })}
       </div>
+
+      <button
+        onClick={() => {
+          setStartDate(undefined);
+          setEndDate(undefined);
+          setDatesBetween([]);
+        }}
+      >
+        Clear
+      </button>
     </div>
   );
 }

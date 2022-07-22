@@ -27,12 +27,17 @@ export const isLeapYear = (year: number) =>
   (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
 export const initMonth = (timestamp: number, setActiveMonthIdx: any) => {
+  // const dateString = new Date(_timestamp).toDateString();
+  // console.log("dateString", dateString);
+  // const timestamp = new Date(dateString).getTime();
   // This function will only be called on mount
   const tempDate = new Date(timestamp);
 
   setActiveMonthIdx(tempDate.getMonth());
 
-  const actualDate = tempDate.getUTCDate();
+  const actualDate = tempDate.getDate();
+
+  console.log("actualDate", actualDate);
 
   const datesBefore = MONTH_BOXES.slice(0, actualDate);
 
@@ -50,7 +55,7 @@ export const initMonth = (timestamp: number, setActiveMonthIdx: any) => {
 
   // Index 0 of output will always be the first date of the month
   const firstDayInOutput = output[0];
-  const firstDayPositionInTheWeek = new Date(firstDayInOutput).getUTCDay();
+  const firstDayPositionInTheWeek = new Date(firstDayInOutput).getDay();
 
   if (firstDayPositionInTheWeek !== 0) {
     let preceedingDaysCount = firstDayPositionInTheWeek;
@@ -62,17 +67,106 @@ export const initMonth = (timestamp: number, setActiveMonthIdx: any) => {
   return output.slice(0, 35);
 };
 
-export const getMonthDays = (timestamp: number, next: boolean): number[] => {
+export const getMonthDays = (
+  timestamp: number,
+  next: boolean,
+  activeMonthIdx: number
+): number[] => {
   let output: number[] = [];
 
+  const tempDate = new Date(timestamp);
   if (next) {
-    for (let i = 0; i < MONTH_BOXES.length; i++) {
-      output = [...output, timestamp + DAY_IN_MILLISECONDS * i];
+    // check if timestamp belongs to the active month. If not loop until you get active month start date. Get its idx in 0-6
+    if (tempDate.getMonth() !== activeMonthIdx) {
+      let count = 0;
+      let dateToIncrement = timestamp;
+      let datesArr: number[] = [timestamp];
+      while (new Date(datesArr[count]).getMonth() !== activeMonthIdx) {
+        dateToIncrement += DAY_IN_MILLISECONDS;
+        datesArr = [...datesArr, dateToIncrement];
+        count = count + 1;
+      }
+
+      for (let i = 1; i < MONTH_BOXES.length - count; i++) {
+        output = [...output, datesArr[count] + DAY_IN_MILLISECONDS * i];
+      }
+      output = [...datesArr, ...output];
+    } else {
+      // Check if the timestamp is the first date
+      if (tempDate.getDay() === 0 && tempDate.getDate() === 1) {
+        for (let i = 0; i < MONTH_BOXES.length; i++) {
+          output = [...output, timestamp + DAY_IN_MILLISECONDS * i];
+        }
+      } else {
+        // Get the index of the timestamp 0-6
+        let datesBefore: number[] = [];
+
+        for (let i = 0; i <= 7; i++) {
+          datesBefore = [timestamp - DAY_IN_MILLISECONDS * i, ...datesBefore];
+        }
+
+        datesBefore = [...datesBefore];
+
+        for (let i = 1; i < MONTH_BOXES.length; i++) {
+          output = [...output, timestamp + DAY_IN_MILLISECONDS * i];
+        }
+        output = [...datesBefore, ...output].slice(0, 35);
+      }
     }
   } else {
-    for (let i = 0; i < 35; i++) {
-      output = [timestamp - DAY_IN_MILLISECONDS * i, ...output];
+    // Loop through the dates to get the active month date 1
+    let dateToDecrement = timestamp;
+    while (dateToDecrement) {
+      if (
+        new Date(dateToDecrement).getDate() === 1 &&
+        new Date(dateToDecrement).getMonth() === activeMonthIdx
+      ) {
+        break;
+      } else {
+        dateToDecrement = dateToDecrement - DAY_IN_MILLISECONDS;
+      }
     }
+
+    const dateOneWeekIdx = new Date(dateToDecrement).getDay();
+
+    let datesBefore: number[] = [];
+
+    if (dateOneWeekIdx !== 0) {
+      // Get dates before
+      for (let i = 0; i < dateOneWeekIdx + 1; i++) {
+        datesBefore = [
+          dateToDecrement - DAY_IN_MILLISECONDS * i,
+          ...datesBefore,
+        ];
+      }
+
+      for (let i = 1; i < MONTH_BOXES.length; i++) {
+        output = [...output, dateToDecrement + DAY_IN_MILLISECONDS * i];
+      }
+      output = [...datesBefore, ...output].slice(0, 35);
+    } else {
+      for (let i = 0; i < MONTH_BOXES.length; i++) {
+        output = [...output, dateToDecrement + DAY_IN_MILLISECONDS * i];
+      }
+    }
+  }
+
+  return output;
+};
+
+export const isToday = (someDate: Date) => {
+  const today = new Date();
+  return someDate.toDateString() === today.toDateString();
+};
+
+export const getDatesBetween = (startDate: number, endDate: number) => {
+  let output: number[] = [startDate];
+
+  let tempStartDate = startDate;
+
+  while (tempStartDate < endDate) {
+    tempStartDate = output[output.length - 1] + DAY_IN_MILLISECONDS;
+    output = [...output, tempStartDate];
   }
 
   return output;
