@@ -26,6 +26,10 @@
     "dates",
     "daterange"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drogon98/react-lightweight-daterange-picker"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
