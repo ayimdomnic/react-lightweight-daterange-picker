@@ -1,7 +1,7 @@
 {
   "name": "react-lightweight-daterange-picker",
   "description": "A lightweight date range picker for your React app.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "scripts": {
     "rollup": "rollup -c",
     "test": "jest"
