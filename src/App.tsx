@@ -11,7 +11,7 @@ function App() {
   return (
     <Calendar
       // startDate={new Date().getTime()}
-      startDate={1582934400000}
+      startDate={"2022-07-23"}
       setDates={setDates}
     />
   );
