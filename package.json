@@ -22,6 +22,10 @@
     "test": "echo \"No test specified\"",
     "eject": "react-scripts eject"
   },
+  "keywords": [
+    "dates",
+    "daterange"
+  ],
   "eslintConfig": {
     "extends": [
       "react-app",
