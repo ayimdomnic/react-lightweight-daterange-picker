@@ -8,6 +8,12 @@ import Calendar from "./Calendar";
 
 describe("Calendar", () => {
   test("renders the Calendar Componet", () => {
-    render(<Calendar date={new Date()} />);
+    const [dates, setDates] = React.useState<{
+      startDate: number | undefined;
+      endDate: number | undefined;
+    }>();
+    render(
+      <Calendar startDate={new Date().toISOString()} setDates={setDates} />
+    );
   });
 });
