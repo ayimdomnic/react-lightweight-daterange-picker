@@ -27,17 +27,11 @@ export const isLeapYear = (year: number) =>
   (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
 export const initMonth = (timestamp: number, setActiveMonthIdx: any) => {
-  // const dateString = new Date(_timestamp).toDateString();
-  // console.log("dateString", dateString);
-  // const timestamp = new Date(dateString).getTime();
-  // This function will only be called on mount
   const tempDate = new Date(timestamp);
 
   setActiveMonthIdx(tempDate.getMonth());
 
   const actualDate = tempDate.getDate();
-
-  console.log("actualDate", actualDate);
 
   const datesBefore = MONTH_BOXES.slice(0, actualDate);
 
