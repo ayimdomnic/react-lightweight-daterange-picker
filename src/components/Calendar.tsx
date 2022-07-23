@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent, useLayoutEffect } from "react";
+import React, { MouseEvent, useLayoutEffect, useState } from "react";
 import {
   DAYS,
   DAY_IN_MILLISECONDS,
@@ -10,8 +10,8 @@ import {
 } from "../helpers";
 
 interface ICalendarProps {
-  startDate: number;
-  endDate?: number;
+  startDate: string;
+  endDate?: string;
   setDates: React.Dispatch<
     React.SetStateAction<
       | {
@@ -32,27 +32,31 @@ export default function Calendar({ setDates, ...props }: ICalendarProps) {
 
   useLayoutEffect(() => {
     // Check if the dates have a common factor
-    setMonthDays(initMonth(props.startDate, setActiveMonthIdx));
-  }, [props.endDate, props.startDate]);
 
-  useEffect(() => {
-    if (props.startDate) {
-      const newStartDate = new Date(props.startDate);
-      const startDateIsToday = isToday(newStartDate);
-      if (!startDateIsToday) {
-        if (props.endDate) {
-          setDatesBetween(getDatesBetween(props.startDate, props.endDate));
-        } else {
-          setDatesBetween([props.startDate]);
-        }
+    let tempStartDate = new Date(props.startDate).getTime();
+    let tempEndDate = new Date(
+      props.endDate ? props.endDate : props.startDate
+    ).getTime();
+
+    const diff = Math.abs(tempEndDate - tempStartDate);
+
+    let endDateCounter = tempStartDate;
+    if (diff % DAY_IN_MILLISECONDS !== 0) {
+      while (
+        new Date(endDateCounter).toDateString() !==
+        new Date(tempEndDate).toLocaleString()
+      ) {
+        endDateCounter = endDateCounter + DAY_IN_MILLISECONDS;
       }
-    }
-    if (props.endDate) {
-      setEndDate(props.endDate);
-    }
-  }, [props.startDate, props.endDate]);
 
-  console.log("startDate :>> ", startDate);
+      tempEndDate = endDateCounter;
+    }
+
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+
+    setMonthDays(initMonth(tempStartDate, setActiveMonthIdx));
+  }, [props.endDate, props.startDate]);
 
   const handleDatePick = (e: MouseEvent<HTMLButtonElement>, val: number) => {
     e.preventDefault();
@@ -64,15 +68,15 @@ export default function Calendar({ setDates, ...props }: ICalendarProps) {
         setEndDate(startDate);
         setStartDate(val);
         setDatesBetween(getDatesBetween(val, startDate));
-        // setDates({ startDate: val, endDate: startDate });
+        setDates({ startDate: val, endDate: startDate });
       } else if (val > startDate) {
         setEndDate(val);
         setDatesBetween(getDatesBetween(startDate, val));
-        // setDates({ startDate, endDate: val });
+        setDates({ startDate, endDate: val });
       } else {
         setStartDate(val);
         setEndDate(val);
-        // setDates({ startDate: val, endDate: val });
+        setDates({ startDate: val, endDate: val });
         setDatesBetween(getDatesBetween(val, val));
       }
     }
