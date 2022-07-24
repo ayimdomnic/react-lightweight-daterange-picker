@@ -140,8 +140,8 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
           return (
             <button
               key={idx}
-              className={`rldrp-date ${_isToday ? `today` : ``} ${
-                _isSelected ? `selected` : ``
+              className={`rldrp-date ${_isToday ? `rldrp_today` : ``} ${
+                _isSelected ? `rldrp_selected` : ``
               }`}
               onClick={(e) => handleDatePick(e, date)}
             >

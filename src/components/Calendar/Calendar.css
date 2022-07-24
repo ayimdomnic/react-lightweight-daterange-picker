@@ -45,10 +45,10 @@
   box-shadow: none !important;
 }
 
-.today {
+.rldrp_today {
   background-color: red;
 }
 
-.selected {
+.rldrp_selected {
   background-color: green !important;
 }
