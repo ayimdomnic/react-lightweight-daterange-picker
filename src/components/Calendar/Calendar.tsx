@@ -122,25 +122,25 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
     setMonthDays([...tempMonthDays]);
   };
   return (
-    <div className="drp_calendar_wrapper">
-      <div className="drp_next_prev_btns_wrapper">
+    <div className="rldrp_calendar_wrapper">
+      <div className="rldrp_next_prev_btns_wrapper">
         <button onClick={handlePrevClick}>Prev</button>
         <span>{MONTHS[activeMonthIdx]}</span>
         <button onClick={handleNextClick}>Next</button>
       </div>
-      <div className="drp_day_labels_wrapper">
+      <div className="rldrp_day_labels_wrapper">
         {DAYS.map((day: string, idx: number) => (
           <div key={idx}>{day}</div>
         ))}
       </div>
-      <div className="drp_days_wrapper">
+      <div className="rldrp_days_wrapper">
         {monthDays.map((date: number, idx: number) => {
           const _isToday = isToday(new Date(date));
           const _isSelected = datesBetween.find((d) => d === date);
           return (
             <button
               key={idx}
-              className={`drp-date ${_isToday ? `today` : ``} ${
+              className={`rldrp-date ${_isToday ? `today` : ``} ${
                 _isSelected ? `selected` : ``
               }`}
               onClick={(e) => handleDatePick(e, date)}

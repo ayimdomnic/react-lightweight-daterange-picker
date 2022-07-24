@@ -3,27 +3,27 @@
   margin: 0;
 }
 
-.drp_calendar_wrapper {
+.rldrp_calendar_wrapper {
   width: 350px;
 }
 
-.drp_next_prev_btns_wrapper {
+.rldrp_next_prev_btns_wrapper {
   display: flex;
   justify-content: space-between;
 }
 
-.drp_day_labels_wrapper {
+.rldrp_day_labels_wrapper {
   width: 350px;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   margin: auto;
   display: grid;
 }
 
-.drp_day_labels_wrapper div {
+.rldrp_day_labels_wrapper div {
   text-align: center;
 }
 
-.drp_days_wrapper {
+.rldrp_days_wrapper {
   /* height/5 === width/7 */
   width: 350px;
   height: 250px;
@@ -33,7 +33,7 @@
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 }
 
-.drp-date {
+.rldrp-date {
   width: 100%;
   height: 100%;
   display: flex;
