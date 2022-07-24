@@ -4,11 +4,10 @@ import { render } from "@testing-library/react";
 
 import Calendar from "./Calendar";
 
-// jest.mock('react-dom/test-utils', () => ({}))
-
 describe("Calendar", () => {
   test("renders the Calendar Componet", () => {
     //
-    render(<Calendar startDate={new Date().toISOString()} />);
+    const setDates = jest.fn();
+    render(<Calendar startDate={new Date().toISOString()} setDates={setDates} />);
   });
 });
