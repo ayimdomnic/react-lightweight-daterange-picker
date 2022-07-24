@@ -7,17 +7,18 @@ import {
   initMonth,
   isToday,
   MONTHS,
+  stringifyDate,
 } from "../../helpers";
 import "./Calendar.css";
 
 export interface ICalendarProps {
   startDate: string;
   endDate?: string;
-  setDates?: React.Dispatch<
+  setDates: React.Dispatch<
     React.SetStateAction<
       | {
-          startDate: number | undefined;
-          endDate: number | undefined;
+          startDate: string | undefined;
+          endDate: string | undefined;
         }
       | undefined
     >
@@ -30,16 +31,17 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
   const [startDate, setStartDate] = useState<number | undefined>(0);
   const [datesBetween, setDatesBetween] = useState<number[]>([]);
   const [endDate, setEndDate] = useState<number | undefined>(0);
+  const [activeYear, setActiveYear] = useState(0);
 
   useLayoutEffect(() => {
-    let tempStartDate = new Date(props.startDate).getTime();
+    let tempStartDate = new Date(props.startDate);
     let tempEndDate = new Date(
       props.endDate ? props.endDate : props.startDate
     ).getTime();
 
-    const diff = Math.abs(tempEndDate - tempStartDate);
+    const diff = Math.abs(tempEndDate - tempStartDate.getTime());
 
-    let endDateCounter = tempStartDate;
+    let endDateCounter = tempStartDate.getTime();
     if (diff % DAY_IN_MILLISECONDS !== 0) {
       while (
         new Date(endDateCounter).toDateString() !==
@@ -51,10 +53,12 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
       tempEndDate = endDateCounter;
     }
 
-    setStartDate(tempStartDate);
+    setStartDate(tempStartDate.getTime());
+    setActiveMonthIdx(tempStartDate.getMonth());
+    setActiveYear(tempStartDate.getFullYear());
     setEndDate(tempEndDate);
 
-    setMonthDays(initMonth(tempStartDate, setActiveMonthIdx));
+    setMonthDays(initMonth(tempStartDate.getTime(), setActiveMonthIdx));
   }, [props.startDate, props.endDate]);
 
   const handleDatePick = (e: MouseEvent<HTMLButtonElement>, val: number) => {
@@ -67,16 +71,25 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
         setEndDate(startDate);
         setStartDate(val);
         setDatesBetween(getDatesBetween(val, startDate));
-        setDates?.({ startDate: val, endDate: startDate });
+        setDates({
+          startDate: stringifyDate(val),
+          endDate: stringifyDate(startDate),
+        });
       } else if (val > startDate) {
         setEndDate(val);
         setDatesBetween(getDatesBetween(startDate, val));
-        setDates?.({ startDate, endDate: val });
+        setDates({
+          startDate: stringifyDate(startDate),
+          endDate: stringifyDate(val),
+        });
       } else {
         setStartDate(val);
         setEndDate(val);
-        setDates?.({ startDate: val, endDate: val });
         setDatesBetween(getDatesBetween(val, val));
+        setDates({
+          startDate: stringifyDate(val),
+          endDate: stringifyDate(val),
+        });
       }
     }
   };
@@ -87,10 +100,8 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
     let tempMonthIdx = 0;
     if (activeMonthIdx === 0) {
       tempMonthIdx = 11;
-      // setActiveMonthIdx(11);
     } else {
       tempMonthIdx = activeMonthIdx - 1;
-      // setActiveMonthIdx(activeMonthIdx - 1);
     }
 
     const tempMonthDays = getMonthDays(
@@ -98,6 +109,7 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
       false,
       tempMonthIdx
     );
+    setActiveYear(new Date(tempMonthDays[15]).getFullYear());
     setActiveMonthIdx(tempMonthIdx);
     setMonthDays([...tempMonthDays]);
   };
@@ -108,25 +120,57 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
     let tempMonthIdx = 0;
     if (activeMonthIdx === 11) {
       tempMonthIdx = 0;
-      // setActiveMonthIdx(0);
     } else {
       tempMonthIdx = activeMonthIdx + 1;
-      // setActiveMonthIdx(activeMonthIdx + 1);
     }
     const tempMonthDays = getMonthDays(
       monthDays[34] + DAY_IN_MILLISECONDS,
       true,
       tempMonthIdx
     );
+    setActiveYear(new Date(tempMonthDays[15]).getFullYear());
     setActiveMonthIdx(tempMonthIdx);
     setMonthDays([...tempMonthDays]);
   };
+
   return (
     <div className="rldrp_calendar_wrapper">
       <div className="rldrp_next_prev_btns_wrapper">
-        <button onClick={handlePrevClick}>Prev</button>
-        <span>{MONTHS[activeMonthIdx]}</span>
-        <button onClick={handleNextClick}>Next</button>
+        <button onClick={handlePrevClick}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            role="img"
+            width="1em"
+            height="1em"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 1024 1024"
+          >
+            <path
+              fill="currentColor"
+              d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0z"
+            />
+          </svg>
+        </button>
+        <span className="rldrp_month_year">
+          {MONTHS[activeMonthIdx]} {activeYear}
+        </span>
+        <button onClick={handleNextClick}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            role="img"
+            width="1em"
+            height="1em"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 1024 1024"
+          >
+            <path
+              fill="currentColor"
+              d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8l-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0z"
+            />
+          </svg>
+        </button>
       </div>
       <div className="rldrp_day_labels_wrapper">
         {DAYS.map((day: string, idx: number) => (
@@ -151,15 +195,17 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
         })}
       </div>
 
-      <button
-        onClick={() => {
-          setStartDate(undefined);
-          setEndDate(undefined);
-          setDatesBetween([]);
-        }}
-      >
-        Clear
-      </button>
+      <div className="rldrp-footer">
+        <button
+          onClick={() => {
+            setStartDate(undefined);
+            setEndDate(undefined);
+            setDatesBetween([]);
+          }}
+        >
+          Clear
+        </button>
+      </div>
     </div>
   );
 };

@@ -4,29 +4,44 @@
 }
 
 .rldrp_calendar_wrapper {
-  width: 350px;
+  width: 300px;
+  font-size: 0.7em !important;
 }
 
 .rldrp_next_prev_btns_wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.rldrp_next_prev_btns_wrapper button {
+  background-color: inherit;
+  border: none !important;
+}
+
+.rldrp_month_year {
+  display: inline-block;
+  text-transform: capitalize;
 }
 
 .rldrp_day_labels_wrapper {
-  width: 350px;
+  width: 300px;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   margin: auto;
   display: grid;
+  margin: 10px 0;
 }
 
 .rldrp_day_labels_wrapper div {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .rldrp_days_wrapper {
   /* height/5 === width/7 */
-  width: 350px;
-  height: 250px;
+  width: 300px;
+  height: 200px;
   margin: auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -43,6 +58,9 @@
   outline: none !important;
   cursor: pointer;
   box-shadow: none !important;
+  background-color: inherit;
+  margin: 0 !important;
+  font-size: inherit;
 }
 
 .rldrp_today {
@@ -51,4 +69,16 @@
 
 .rldrp_selected {
   background-color: green !important;
+  color: #fff;
+}
+
+.rldrp-footer {
+  display: flex;
+  justify-content: end;
+  margin: 10px 0;
+}
+
+.rldrp-footer button {
+  background-color: inherit;
+  border: none !important;
 }
