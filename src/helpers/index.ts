@@ -165,3 +165,7 @@ export const getDatesBetween = (startDate: number, endDate: number) => {
 
   return output;
 };
+
+export const stringifyDate = (date: number): string => {
+  return new Date(date).toLocaleDateString();
+};
