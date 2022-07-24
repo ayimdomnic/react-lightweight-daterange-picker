@@ -13,7 +13,7 @@ import "./Calendar.css";
 export interface ICalendarProps {
   startDate: string;
   endDate?: string;
-  setDates: React.Dispatch<
+  setDates?: React.Dispatch<
     React.SetStateAction<
       | {
           startDate: number | undefined;
@@ -67,15 +67,15 @@ const Calendar: React.FC<ICalendarProps> = ({ setDates, ...props }) => {
         setEndDate(startDate);
         setStartDate(val);
         setDatesBetween(getDatesBetween(val, startDate));
-        setDates({ startDate: val, endDate: startDate });
+        setDates?.({ startDate: val, endDate: startDate });
       } else if (val > startDate) {
         setEndDate(val);
         setDatesBetween(getDatesBetween(startDate, val));
-        setDates({ startDate, endDate: val });
+        setDates?.({ startDate, endDate: val });
       } else {
         setStartDate(val);
         setEndDate(val);
-        setDates({ startDate: val, endDate: val });
+        setDates?.({ startDate: val, endDate: val });
         setDatesBetween(getDatesBetween(val, val));
       }
     }
